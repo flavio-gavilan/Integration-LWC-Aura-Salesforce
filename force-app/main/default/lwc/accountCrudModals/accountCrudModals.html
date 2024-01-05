@@ -1,0 +1,224 @@
+<template>
+    <lightning-card>
+        <lightning-input
+            label="AccountName"
+            type="search"
+            placeholder="Insert Account Name"
+            value={accName}
+            onchange={changeHandler}>
+        </lightning-input>
+
+        <lightning-button 
+            label="Search Account" 
+            variant="brand" 
+            title="Search Account" 
+            icon-name="utility:search"
+            onclick={searchAccount}>
+        </lightning-button>
+        <lightning-button 
+            label="Create Account" 
+            variant="success" 
+            title="Create Account" 
+            icon-name="utility:new"
+            onclick={modalCreateRecord}>
+        </lightning-button>
+    </lightning-card>
+
+    <lightning-card if:true={isTableModalOpen}>
+        <section role="dialog" 
+            tabindex="-1" 
+            aria-modal="true" 
+            aria-labelledby="modal-heading-01" 
+            class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">                
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-hyphenate">Search Account Result</h1>
+                </div>
+
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <section>
+                        <div style="height: 300px; width:90%;">
+                            <lightning-datatable
+                                key-field="Id"
+                                data={data}
+                                show-row-number-columns
+                                row-number-offset={rowOffset}
+                                suppress-bottom-bar
+                                columns={columns}
+                                onrowselection={getIdSelectedRecord}>
+                            </lightning-datatable>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="slds-modal__footer">
+                    <lightning-button 
+                        label="Create Account" 
+                        variant="success" 
+                        title="Create Account" 
+                        icon-name="utility:new"
+                        onclick={modalCreateRecord}>
+                    </lightning-button>
+                    <lightning-button class="slds-button slds-button_brand"
+                        variant="brand"
+                        aria-label="Update Record"
+                        label="Update"
+                        icon-name="utility:edit"
+                        onclick={modalUpdateRecord}>
+                    </lightning-button>
+                    <lightning-button class="slds-button slds-button slds-button_destructive"
+                        variant="destructive"
+                        aria-label="Delete Record" 
+                        label="Delete" 
+                        icon-name="utility:delete"
+                        onclick={deleteRecord}>
+                    </lightning-button>
+                    <lightning-button class="slds-button slds-button slds-button_destructive"
+                        variant="destructive"
+                        aria-label="Cancel and close" 
+                        label="Cancel" 
+                        icon-name="utility:clear"
+                        onclick={closeModal}>
+                    </lightning-button>
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </lightning-card>
+
+    <lightning-card if:true={isCreateModalOpen}>
+        <section role="dialog" 
+            tabindex="-1" 
+            aria-modal="true" 
+            aria-labelledby="modal-heading-01" 
+            class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">                
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-hyphenate">Create New Account</h1>
+                </div>
+
+                
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <section>
+                        <lightning-input
+                            label="AccountName"
+                            type="text"
+                            value={accName}
+                            required
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                        <lightning-combobox 
+                            label="AccountType" 
+                            value={accType}
+                            required
+                            onchange={handlerUpdate}
+                            options={typeOptions}>
+                        </lightning-combobox>
+                        <lightning-input
+                            label="AccountPhone"
+                            type="tel"
+                            value={accPhone}
+                            
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                        <!--pattern="[0-9]{2}-[0-9]{4}-[0-9]{5}"-->
+                        <lightning-input
+                            label="AccountWebsite"
+                            type="url"
+                            value={accWebsite}
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                    </section>
+                </div>
+
+                <div class="slds-modal__footer">
+                    <lightning-button class="slds-button slds-button_success"
+                        variant="success"
+                        aria-label="Create Record"
+                        label="Create"
+                        icon-name="utility:new"
+                        onclick={saveRecordAccount}>
+                    </lightning-button>
+                    <lightning-button class="slds-button slds-button slds-button_destructive"
+                        variant="destructive"
+                        aria-label="Cancel and close" 
+                        label="Cancel" 
+                        icon-name="utility:clear"
+                        onclick={closeModal}>
+                    </lightning-button>
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </lightning-card>
+
+    <lightning-card if:true={isUpdateModalOpen}>
+        <section role="dialog" 
+            tabindex="-1" 
+            aria-modal="true" 
+            aria-labelledby="modal-heading-01" 
+            class="slds-modal slds-fade-in-open">
+
+            <div class="slds-modal__container">                
+                <div class="slds-modal__header">
+                    <h1 class="slds-modal__title slds-hyphenate">Update Record Values</h1>
+                </div>
+
+                <div class="slds-modal__content slds-var-p-around_medium">
+                    <section>
+                        <lightning-input
+                            label="AccountName"
+                            type="text"
+                            value={dataUpdate.Name}
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                        <lightning-combobox 
+                            label="AccountType" 
+                            value={dataUpdate.Type}
+                            onchange={handlerUpdate}
+                            options={typeOptions}>
+                        </lightning-combobox>
+                        <lightning-input
+                            label="AccountPhone"
+                            type="tel"
+                            value={dataUpdate.Phone}
+                            
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                        <!--pattern="[0-9]{2}-[0-9]{4}-[0-9]{5}"-->
+                        <lightning-input
+                            label="AccountWebsite"
+                            type="url"
+                            value={dataUpdate.Website}
+                            onchange={handlerUpdate}>
+                        </lightning-input>
+                    </section>
+                </div>
+
+                <div class="slds-modal__footer">
+                    <lightning-button class="slds-button slds-button_brand"
+                        variant="brand"
+                        aria-label="Update Record"
+                        label="Update"
+                        icon-name="utility:save"
+                        onclick={updateRecordAccount}>
+                    </lightning-button>
+                    <lightning-button class="slds-button slds-button slds-button_destructive"
+                        variant="destructive"
+                        aria-label="Cancel and close" 
+                        label="Cancel" 
+                        icon-name="utility:clear"
+                        onclick={closeModal}>
+                    </lightning-button>
+                    
+                </div>
+            </div>
+        </section>
+
+        <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+    </lightning-card>
+</template>
